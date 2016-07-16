@@ -3,6 +3,14 @@ package com.iostate.hasta.util;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * Copy properties from an instance of AClass to an instance of BClass,
+ * even if AClass and BClass have nested structures and collections/maps of instances of other classes.
+ *
+ * You can also do batch copying on collections or maps.
+ *
+ * @see ConverterRegistry During setup(before using BeanCopy), you can add custom converters to supply or override the default behavior.
+ */
 public class BeanCopy {
 
   public static void copy(Object source, Object target) {

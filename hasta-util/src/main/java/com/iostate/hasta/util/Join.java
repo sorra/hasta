@@ -4,6 +4,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Combine and compute two collections or two maps by their common keys,
+ * this is like INNER JOIN because we dislike null values.
+ */
 public class Join {
 
   /** Assumption: coll1.size <= coll2.size */
@@ -37,8 +41,11 @@ public class Join {
 
     for (V2 v2 : coll2) {
       K key = extractor2.extract(v2);
-      R result = joinFunction.compute(key, map1.get(key), v2);
-      results.put(key, result);
+      V1 v1 = map1.get(key);
+      if (v1 != null) {
+        R result = joinFunction.compute(key, v1, v2);
+        results.put(key, result);
+      }
     }
     return results;
   }
@@ -49,8 +56,11 @@ public class Join {
     Map<K, R> results = new HashMap<>();
     for (Map.Entry<K, V1> entry1 : map1.entrySet()) {
       K key = entry1.getKey();
-      R result = joinFunction.compute(key, entry1.getValue(), map2.get(key));
-      results.put(key, result);
+      V2 v2 = map2.get(key);
+      if (v2 != null) {
+        R result = joinFunction.compute(key, entry1.getValue(), v2);
+        results.put(key, result);
+      }
     }
     return results;
   }

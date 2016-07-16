@@ -2,6 +2,11 @@ package com.iostate.hasta.util;
 
 import java.util.Objects;
 
+/**
+ * A tuple of two elements
+ * @param <A> first element
+ * @param <B> second element
+ */
 public class Pair<A, B> {
   private A a;
   private B b;

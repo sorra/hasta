@@ -4,6 +4,9 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Registry of all generated bean copiers.
+ */
 public class BeanCopierRegistry {
   private static Map<Pair<Class, Class>, BeanCopier> topBeanCopierMap = new ConcurrentHashMap<>();
   private static Map<Pair<Field, Field>, BeanCopier> refBeanCopierMap = new ConcurrentHashMap<>();
