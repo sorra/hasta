@@ -6,12 +6,12 @@ import java.util.Map;
 
 import com.iostate.hasta.util.exception.BeanCopyException;
 
-public class MapCopier implements Copier {
+class MapCopier implements Copier {
   private Field fromField;
   private Field toField;
   private Converter converter = null;
 
-  public MapCopier(Field fromField, Field toField, String fromEtalType, String toEtalType) {
+  MapCopier(Field fromField, Field toField, String fromEtalType, String toEtalType) {
     this.fromField = fromField;
     this.toField = toField;
     fromField.setAccessible(true);

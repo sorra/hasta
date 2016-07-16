@@ -5,12 +5,12 @@ import java.lang.reflect.Field;
 import com.iostate.hasta.util.exception.BeanAnalysisException;
 import com.iostate.hasta.util.exception.BeanCopyException;
 
-public class SingleCopier implements Copier {
+class SingleCopier implements Copier {
   private Field fromField;
   private Field toField;
   private Converter converter = null;
 
-  public SingleCopier(Field fromField, Field toField) {
+  SingleCopier(Field fromField, Field toField) {
     this.fromField = fromField;
     this.toField = toField;
     fromField.setAccessible(true);

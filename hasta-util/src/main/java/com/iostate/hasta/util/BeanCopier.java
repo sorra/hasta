@@ -8,7 +8,7 @@ import com.iostate.hasta.util.exception.BeanCopyException;
 
 import static com.iostate.hasta.util.Utils.*;
 
-public class BeanCopier implements Copier {
+class BeanCopier implements Copier {
   private Field fromField;
   private Field toField;
   private Class<?> fromCls;
@@ -19,7 +19,7 @@ public class BeanCopier implements Copier {
   private List<Copier> copiers = null;
 
   /** Top bean */
-  public BeanCopier(Class<?> fromCls, Class<?> toCls) {
+  BeanCopier(Class<?> fromCls, Class<?> toCls) {
     this.fromCls = fromCls;
     this.toCls = toCls;
     converter = ConverterRegistry.find(fromCls.getName(), toCls.getName());
@@ -32,7 +32,7 @@ public class BeanCopier implements Copier {
   }
 
   /** Referenced bean */
-  public BeanCopier(Field fromField, Field toField) {
+  BeanCopier(Field fromField, Field toField) {
     this.fromField = fromField;
     this.toField = toField;
     this.fromCls = fromField.getType();
@@ -49,7 +49,7 @@ public class BeanCopier implements Copier {
   }
 
   /** Defer after construction to avoid cyclic reference */
-  public void ensureAnalyzed() {
+  void ensureAnalyzed() {
     if (converter != null) {
       return;
     }
@@ -64,7 +64,7 @@ public class BeanCopier implements Copier {
   }
 
   /** Top bean */
-  public Object topCopy(Object source) {
+  Object topCopy(Object source) {
     if (converter != null) {
       return converter.convert(source);
     }
@@ -80,7 +80,7 @@ public class BeanCopier implements Copier {
   }
 
   /** Top bean */
-  public void topCopy(Object source, Object target) {
+  void topCopy(Object source, Object target) {
     ensureAnalyzed();
     for (Copier copier : copiers) {
       copier.copy(source, target);
