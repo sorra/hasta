@@ -9,40 +9,42 @@ import com.iostate.hasta.util.beans.UserView;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static java.util.Collections.singletonList;
+
 public class BeanCopyTest {
   @Test
   public void testCopySingle() throws Exception {
-    BeanCopierRegistry.findOrCreate(User.class, UserView.class);
-    BeanCopier beanCopier = BeanCopierRegistry.findOrCreate(Site.class, SiteView.class);
-
-    System.out.println(beanCopier);
-    System.out.println();
-
     Site site = new Site("MySite", new HashMap<String, User>());
-    site.getUsers().put("CEO", new User("CEO", null));
+    User admin = new User("Admin", null);
+    site.setAdmin(admin);
+    site.getUsers().put("CEO", new User("CEO", singletonList(admin)));
     SiteView siteView = new SiteView(null, null);
     BeanCopy.copy(site, siteView);
 
-    Assert.assertEquals("SiteView{name='MySite', users={CEO=User{name='CEO', underHands=null}}}", siteView.toString());
+    Assert.assertEquals("SiteView{name='MySite', admin=UserView{name='Admin', underHands=null}, users={CEO=UserView{name='CEO', underHands=[UserView{name='Admin', underHands=null}]}}}", siteView.toString());
   }
 
   @Test
   public void testCopyCollection() throws Exception {
     Site site = new Site("MySite", new HashMap<String, User>());
-    site.getUsers().put("CEO", new User("CEO", null));
+    User admin = new User("Admin", null);
+    site.setAdmin(admin);
+    site.getUsers().put("CEO", new User("CEO", singletonList(admin)));
     Collection<Site> sites = Arrays.asList(site, site);
     Collection<SiteView> siteViews = new HashSet<>();
     BeanCopy.copy(sites, siteViews, Site.class, SiteView.class);
 
     Assert.assertEquals(
-        "[SiteView{name='MySite', users={CEO=User{name='CEO', underHands=null}}}, SiteView{name='MySite', users={CEO=User{name='CEO', underHands=null}}}]",
+        "[SiteView{name='MySite', admin=UserView{name='Admin', underHands=null}, users={CEO=UserView{name='CEO', underHands=[UserView{name='Admin', underHands=null}]}}}, SiteView{name='MySite', admin=UserView{name='Admin', underHands=null}, users={CEO=UserView{name='CEO', underHands=[UserView{name='Admin', underHands=null}]}}}]",
         siteViews.toString());
   }
 
   @Test
   public void testCopyMap() throws Exception {
     Site site = new Site("MySite", new HashMap<String, User>());
-    site.getUsers().put("CEO", new User("CEO", null));
+    User admin = new User("Admin", null);
+    site.setAdmin(admin);
+    site.getUsers().put("CEO", new User("CEO", singletonList(admin)));
     Map<String, Site> sites = new HashMap<>();
     sites.put("Site1", site);
     sites.put("Site2", site);
@@ -50,8 +52,37 @@ public class BeanCopyTest {
     BeanCopy.copy(sites, siteViews, Site.class, SiteView.class);
 
     Assert.assertEquals(
-        "{Site1=SiteView{name='MySite', users={CEO=User{name='CEO', underHands=null}}}, Site2=SiteView{name='MySite', users={CEO=User{name='CEO', underHands=null}}}}",
+        "{Site1=SiteView{name='MySite', admin=UserView{name='Admin', underHands=null}, users={CEO=UserView{name='CEO', underHands=[UserView{name='Admin', underHands=null}]}}}, Site2=SiteView{name='MySite', admin=UserView{name='Admin', underHands=null}, users={CEO=UserView{name='CEO', underHands=[UserView{name='Admin', underHands=null}]}}}}",
         siteViews.toString());
     System.out.println(siteViews);
+  }
+
+  @Test
+  public void testConverter() throws Exception {
+    BeanCopierRegistry.clear();
+    ConverterRegistry.clear();
+
+    // Add converter before creating copiers
+    ConverterRegistry.put(User.class.getName(), UserView.class.getName(), new Converter() {
+      @Override
+      public Object convert(Object from) {
+        User user = (User) from;
+        return new UserView(user.getName()+"-View", new ArrayList<UserView>());
+      }
+    });
+
+    Assert.assertNotNull(ConverterRegistry.find(User.class.getName(), UserView.class.getName()));
+
+    Site site = new Site("MySite", new HashMap<String, User>());
+    User admin = new User("Admin", null);
+    site.setAdmin(admin);
+    site.getUsers().put("CEO", new User("CEO", singletonList(admin)));
+    SiteView siteView = new SiteView(null, null);
+    BeanCopy.copy(site, siteView);
+
+    Assert.assertEquals("SiteView{name='MySite', admin=UserView{name='Admin-View', underHands=[]}, users={CEO=UserView{name='CEO-View', underHands=[]}}}", siteView.toString());
+
+    BeanCopierRegistry.clear();
+    ConverterRegistry.clear();
   }
 }

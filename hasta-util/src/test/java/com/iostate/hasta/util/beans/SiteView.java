@@ -5,11 +5,12 @@ import java.util.Map;
 
 public class SiteView {
   private String name;
-  private Map<String, User> users;
+  private UserView admin;
+  private Map<String, UserView> users;
 
   SiteView() {}
 
-  public SiteView(String name, Map<String, User> users) {
+  public SiteView(String name, Map<String, UserView> users) {
     this.name = name;
     this.users = users;
   }
@@ -22,11 +23,19 @@ public class SiteView {
     this.name = name;
   }
 
-  public Map<String, User> getUsers() {
+  public UserView getAdmin() {
+    return admin;
+  }
+
+  public void setAdmin(UserView admin) {
+    this.admin = admin;
+  }
+
+  public Map<String, UserView> getUsers() {
     return users;
   }
 
-  public void setUsers(Map<String, User> users) {
+  public void setUsers(Map<String, UserView> users) {
     this.users = users;
   }
 
@@ -34,6 +43,7 @@ public class SiteView {
   public String toString() {
     return "SiteView{" +
         "name='" + name + '\'' +
+        ", admin=" + admin +
         ", users=" + users +
         '}';
   }

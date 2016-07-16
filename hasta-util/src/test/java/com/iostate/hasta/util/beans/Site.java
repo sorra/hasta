@@ -4,6 +4,7 @@ import java.util.Map;
 
 public class Site {
   private String name;
+  private User admin;
   private Map<String, User> users;
 
   Site() {}
@@ -21,6 +22,14 @@ public class Site {
     this.name = name;
   }
 
+  public User getAdmin() {
+    return admin;
+  }
+
+  public void setAdmin(User admin) {
+    this.admin = admin;
+  }
+
   public Map<String, User> getUsers() {
     return users;
   }
@@ -33,6 +42,7 @@ public class Site {
   public String toString() {
     return "Site{" +
         "name='" + name + '\'' +
+        ", admin=" + admin +
         ", users=" + users +
         '}';
   }

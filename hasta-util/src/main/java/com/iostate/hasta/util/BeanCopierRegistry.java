@@ -1,11 +1,8 @@
 package com.iostate.hasta.util;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 public class BeanCopierRegistry {
   private static Map<Pair<Class, Class>, BeanCopier> topBeanCopierMap = new ConcurrentHashMap<>();
@@ -30,5 +27,10 @@ public class BeanCopierRegistry {
       refBeanCopierMap.put(pair, beanCopier);
     }
     return beanCopier;
+  }
+
+  static void clear() {
+    topBeanCopierMap.clear();
+    refBeanCopierMap.clear();
   }
 }

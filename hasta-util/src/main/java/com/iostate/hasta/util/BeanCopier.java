@@ -14,13 +14,15 @@ public class BeanCopier implements Copier {
   private Class<?> fromCls;
   private Class<?> toCls;
   private Constructor constructor;
+  private Converter converter = null;
   /** No need to be volatile */
-  private List<Copier> copiers;
+  private List<Copier> copiers = null;
 
   /** Top bean */
   public BeanCopier(Class<?> fromCls, Class<?> toCls) {
     this.fromCls = fromCls;
     this.toCls = toCls;
+    converter = ConverterRegistry.find(fromCls.getName(), toCls.getName());
     try {
       constructor = toCls.getDeclaredConstructor();
       constructor.setAccessible(true);
@@ -35,6 +37,9 @@ public class BeanCopier implements Copier {
     this.toField = toField;
     this.fromCls = fromField.getType();
     this.toCls = toField.getType();
+    fromField.setAccessible(true);
+    toField.setAccessible(true);
+    converter = ConverterRegistry.find(fromCls.getName(), toCls.getName());
     try {
       constructor = toCls.getDeclaredConstructor();
       constructor.setAccessible(true);
@@ -45,6 +50,9 @@ public class BeanCopier implements Copier {
 
   /** Defer after construction to avoid cyclic reference */
   public void ensureAnalyzed() {
+    if (converter != null) {
+      return;
+    }
     // DCL without volatile
     if (copiers == null) {
       synchronized (this) {
@@ -57,6 +65,10 @@ public class BeanCopier implements Copier {
 
   /** Top bean */
   public Object topCopy(Object source) {
+    if (converter != null) {
+      return converter.convert(source);
+    }
+
     Object target;
     try {
       target = constructor.newInstance();
@@ -78,7 +90,6 @@ public class BeanCopier implements Copier {
   /** Referenced bean */
   @Override
   public void copy(Object source, Object target) {
-    ensureAnalyzed();
     Object from, to;
     try {
       from = fromField.get(source);
@@ -87,6 +98,12 @@ public class BeanCopier implements Copier {
         toField.set(target, null);
         return;
       }
+
+      if (converter != null) {
+        toField.set(target, converter.convert(from));
+        return;
+      }
+
       if (to == null) {
         to = constructor.newInstance();
         toField.set(target, to);
@@ -94,6 +111,8 @@ public class BeanCopier implements Copier {
     } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
       throw new BeanCopyException(e);
     }
+
+    ensureAnalyzed();
     for (Copier copier : copiers) {
       copier.copy(from, to);
     }

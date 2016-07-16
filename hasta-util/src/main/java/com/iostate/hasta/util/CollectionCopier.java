@@ -19,7 +19,7 @@ class CollectionCopier implements Copier {
     this.isSet = isSet;
     fromField.setAccessible(true);
     toField.setAccessible(true);
-    converter = Utils.findConverter(fromEtalType, toEtalType);
+    converter = Utils.findOrCreateConverter(fromEtalType, toEtalType);
   }
 
   @Override @SuppressWarnings("unchecked")

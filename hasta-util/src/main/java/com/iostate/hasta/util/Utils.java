@@ -19,7 +19,7 @@ class Utils {
     }
   }
 
-  static Converter findConverter(String fromType, String toType) {
+  static Converter findOrCreateConverter(String fromType, String toType) {
     Converter converter = null;
     Class<?> fromCls;
     Class<?> toCls;
