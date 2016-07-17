@@ -35,18 +35,22 @@ public class BeanCopyTest {
     // Unfortunately this call is successful because Site and User have at least a common field `String name`
     BeanCopierRegistry.findOrCreate(Site.class, User.class);
 
+    // Object has no copyable field
     Exception thrown1 = null;
     try {
       BeanCopierRegistry.findOrCreate(Object.class, Object.class);
     } catch (BeanAnalysisException e) {
+      System.out.println("Output: " + e);
       thrown1 = e;
     }
     Assert.assertNotNull(thrown1);
 
+    // Site and Mono have no common fields to copy
     Exception thrown2 = null;
     try {
       BeanCopierRegistry.findOrCreate(Site.class, Mono.class);
     } catch (BeanAnalysisException e) {
+      System.out.println("Output: " + e);
       thrown2 = e;
     }
     Assert.assertNotNull(thrown2);
