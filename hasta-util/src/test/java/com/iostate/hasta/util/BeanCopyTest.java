@@ -31,9 +31,11 @@ public class BeanCopyTest {
     User admin = new User("Admin", null);
     site.setAdmin(admin);
     site.getUsers().put("CEO", new User("CEO", singletonList(admin)));
+
+    // If there is a converter of Site->SiteView, it works
     SiteView siteView = BeanCopy.copy(site, SiteView.class);
 
-    // If there is a converter of SiteView->SiteView, this converter has no effect for siteView0
+    // If there is a converter of Site->SiteView, it doesn't work
     SiteView siteView0 = new SiteView(null, null);
     BeanCopy.copy(site, siteView0);
 
