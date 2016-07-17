@@ -32,7 +32,7 @@ class SingleCopier implements Copier {
     toField.setAccessible(true);
     Class<?> fromCls = fromField.getType();
     Class<?> toCls = toField.getType();
-    if (!toCls.equals(fromCls) && !toCls.isAssignableFrom(fromCls)) {
+    if (!toCls.isAssignableFrom(fromCls)) {
       converter = ConverterRegistry.find(fromCls.getName(), toCls.getName());
       if (converter == null) {
         throw new BeanAnalysisException(String.format("Converter not found. from: %s, to: %s", fromCls.getName(), toCls.getName()));

@@ -164,6 +164,14 @@ class BeanCopier implements Copier {
         } else if (Collection.class.isAssignableFrom(fieldCls)) {
           copiers.add(new CollectionCopier(fromField, toField, nameOf(fromEtalTypes[0]), nameOf(toEtalTypes[0]), false));
         } else if (Map.class.isAssignableFrom(fieldCls)) {
+          try {
+            if (!toEtalTypes[0].equals(fromEtalTypes[0])
+                && !Class.forName(nameOf(toEtalTypes[0])).isAssignableFrom(Class.forName(nameOf(fromEtalTypes[0])))) {
+              throw new BeanAnalysisException("Key types mismatch: " + fromField + " <-> " + toField);
+            }
+          } catch (ClassNotFoundException e) {
+            throw new BeanAnalysisException(e);
+          }
           copiers.add(new MapCopier(fromField, toField, nameOf(fromEtalTypes[1]), nameOf(toEtalTypes[1])));
         } else {
           Converter converter = ConverterRegistry.find(fromField.getType().getName(), toField.getType().getName());

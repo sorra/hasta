@@ -45,7 +45,7 @@ class Utils {
       throw new BeanAnalysisException(e);
     }
     converter = ConverterRegistry.find(fromType, toType);
-    if (converter == null && !toCls.equals(fromCls) && !toCls.isAssignableFrom(fromCls)) {
+    if (converter == null && !toCls.isAssignableFrom(fromCls)) {
       if (!Utils.isBuiltin(fromCls) && !Utils.isBuiltin(toCls)) {
         final BeanCopier beanCopier = BeanCopierRegistry.findOrCreate(fromCls, toCls);
         if (beanCopier != null) {

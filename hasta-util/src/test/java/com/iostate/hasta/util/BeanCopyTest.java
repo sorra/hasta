@@ -25,37 +25,6 @@ import org.junit.Test;
 import static java.util.Collections.singletonList;
 
 public class BeanCopyTest {
-  /**
-   * This feature is friendly to Continuous Integration (pre-test correctness in CI).
-   */
-  @Test
-  public void testPreTest() {
-    // Use such calls in unit tests to pre-test correctness.
-    BeanCopierRegistry.findOrCreate(Site.class, SiteView.class);
-    // Unfortunately this call is successful because Site and User have at least a common field `String name`
-    BeanCopierRegistry.findOrCreate(Site.class, User.class);
-
-    // Object has no copyable field
-    Exception thrown1 = null;
-    try {
-      BeanCopierRegistry.findOrCreate(Object.class, Object.class);
-    } catch (BeanAnalysisException e) {
-      System.out.println("Output: " + e);
-      thrown1 = e;
-    }
-    Assert.assertNotNull(thrown1);
-
-    // Site and Mono have no common fields to copy
-    Exception thrown2 = null;
-    try {
-      BeanCopierRegistry.findOrCreate(Site.class, Mono.class);
-    } catch (BeanAnalysisException e) {
-      System.out.println("Output: " + e);
-      thrown2 = e;
-    }
-    Assert.assertNotNull(thrown2);
-  }
-
   @Test
   public void testCopySingle() throws Exception {
     Site site = new Site("MySite", new HashMap<String, User>());
@@ -146,5 +115,34 @@ public class BeanCopyTest {
 
     BeanCopierRegistry.clear();
     ConverterRegistry.clear();
+  }
+
+  /**
+   * This feature is friendly to Continuous Integration (pre-test correctness in CI).
+   */
+  @Test
+  public void testPreTestSuccess() {
+    // Use such calls in unit tests to pre-test correctness.
+    BeanCopierRegistry.findOrCreate(Site.class, SiteView.class);
+    // Unfortunately this call is successful because Site and User have at least a common field `String name`
+    BeanCopierRegistry.findOrCreate(Site.class, User.class);
+  }
+
+  @Test(expected = BeanAnalysisException.class)
+  public void testPreTestFailure1() {
+    // Object has no copyable field
+    BeanCopierRegistry.findOrCreate(Object.class, Object.class);
+  }
+
+  @Test(expected = BeanAnalysisException.class)
+  public void testPreTestFailure2() {
+    // Site and Mono have no common fields to copy
+    BeanCopierRegistry.findOrCreate(Site.class, Mono.class);
+  }
+
+  @Test(expected = BeanAnalysisException.class)
+  public void testPreTestFailure3() {
+    // For Map<K1, V> and Map<K2, V> , K1 should be the same or subclass of K2
+    BeanCopierRegistry.findOrCreate(WrongMapA.class, WrongMapB.class);
   }
 }
