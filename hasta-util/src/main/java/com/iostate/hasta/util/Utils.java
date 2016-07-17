@@ -20,7 +20,7 @@ class Utils {
   }
 
   static Converter findOrCreateConverter(String fromType, String toType) {
-    Converter converter = null;
+    Converter converter;
     Class<?> fromCls;
     Class<?> toCls;
     try {
@@ -29,15 +29,15 @@ class Utils {
     } catch (ClassNotFoundException e) {
       throw new BeanAnalysisException(e);
     }
-    if (!toCls.equals(fromCls) && !toCls.isAssignableFrom(fromCls)) {
-      converter = ConverterRegistry.find(fromType, toType);
-      if (converter == null && !Utils.isBuiltin(fromCls) && !Utils.isBuiltin(toCls)) {
+    converter = ConverterRegistry.find(fromType, toType);
+    if (converter == null && !toCls.equals(fromCls) && !toCls.isAssignableFrom(fromCls)) {
+      if (!Utils.isBuiltin(fromCls) && !Utils.isBuiltin(toCls)) {
         final BeanCopier beanCopier = BeanCopierRegistry.findOrCreate(fromCls, toCls);
         if (beanCopier != null) {
           converter = new Converter() {
             @Override
             public Object convert(Object from) {
-              return beanCopier.topCopy(from);
+              return beanCopier.topCopyWithoutTopConverter(from);
             }
           };
         }
@@ -45,7 +45,7 @@ class Utils {
       if (converter == null) {
         throw new BeanAnalysisException(String.format("Converter not found. from: %s, to: %s", fromType, toType));
       }
-    }
+    } // else keep null
     return converter;
   }
 }

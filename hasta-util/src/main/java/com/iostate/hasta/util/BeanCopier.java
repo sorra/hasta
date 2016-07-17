@@ -22,7 +22,7 @@ class BeanCopier implements Copier {
   BeanCopier(Class<?> fromCls, Class<?> toCls) {
     this.fromCls = fromCls;
     this.toCls = toCls;
-    converter = ConverterRegistry.find(fromCls.getName(), toCls.getName());
+     converter = ConverterRegistry.find(fromCls.getName(), toCls.getName());
     try {
       constructor = toCls.getDeclaredConstructor();
       constructor.setAccessible(true);
@@ -64,7 +64,7 @@ class BeanCopier implements Copier {
   }
 
   /** Top bean */
-  Object topCopy(Object source) {
+  Object topCopyWithoutTopConverter(Object source) {
     if (converter != null) {
       return converter.convert(source);
     }
@@ -75,12 +75,12 @@ class BeanCopier implements Copier {
     } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
       throw new BeanCopyException(e);
     }
-    topCopy(source, target);
+    topCopyWithoutTopConverter(source, target);
     return target;
   }
 
   /** Top bean */
-  void topCopy(Object source, Object target) {
+  void topCopyWithoutTopConverter(Object source, Object target) {
     ensureAnalyzed();
     for (Copier copier : copiers) {
       copier.copy(source, target);
@@ -130,9 +130,9 @@ class BeanCopier implements Copier {
       if (fromField == null) {
         continue;
       }
-      Type toFieldType = toField.getGenericType();
-      if (toFieldType instanceof ParameterizedType) {
-        Type[] toEtalTypes = ((ParameterizedType) toFieldType).getActualTypeArguments();
+      Type toFieldGType = toField.getGenericType();
+      if (toFieldGType instanceof ParameterizedType) {
+        Type[] toEtalTypes = ((ParameterizedType) toFieldGType).getActualTypeArguments();
         Type[] fromEtalTypes = ((ParameterizedType) fromField.getGenericType()).getActualTypeArguments();
 
         Class<?> fieldCls = toField.getType();
@@ -143,7 +143,12 @@ class BeanCopier implements Copier {
         } else if (Map.class.isAssignableFrom(fieldCls)) {
           copiers.add(new MapCopier(fromField, toField, nameOf(fromEtalTypes[1]), nameOf(toEtalTypes[1])));
         } else {
-          throw new BeanAnalysisException("Custom generic type is not supported!");
+          Converter converter = ConverterRegistry.find(fromField.getType().getName(), toField.getType().getName());
+          if (converter != null) {
+            copiers.add(new SingleCopier(fromField, toField));
+          } else {
+            throw new BeanAnalysisException("Custom generic type requires converter, otherwise is not supported!");
+          }
         }
       } else {
         if (isBuiltin(fromField.getType()) || isBuiltin(toField.getType())) {
@@ -178,17 +183,21 @@ class BeanCopier implements Copier {
         "`, toField=`" + toField +
         "`, fromCls=`" + fromCls +
         "`, toCls=`" + toCls +
-        "`, copiers=[" + join(copiers) +
-        "]}";
+        "`, converter=" + converter +
+        ", copiers=" + join(copiers) +
+        "}";
   }
 
   private String join(Collection<Copier> items) {
-    StringBuilder sb = new StringBuilder();
+    if (items == null) {
+      return "null";
+    }
+    StringBuilder sb = new StringBuilder("[");
     for (Object item : items) {
       sb.append("\n  ");
       String str = (item instanceof BeanCopier) ? item.getClass().getSimpleName() : item.toString();
       sb.append(str);
     }
-    return sb.toString();
+    return sb.append("]").toString();
   }
 }
