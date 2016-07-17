@@ -123,9 +123,17 @@ class BeanCopier implements Copier {
     for (Field field : allNonStaticFields(sourceCls)) {
       fromFieldsMap.put(field.getName(), field);
     }
+    if (fromFieldsMap.isEmpty()) {
+      throw new BeanAnalysisException(sourceCls.getName() + " has no copyable field!");
+    }
+
+    List<Field> targetFields = allNonStaticFields(targetCls);
+    if (targetFields.isEmpty()) {
+      throw new BeanAnalysisException(targetCls.getName() + " has no copyable field!");
+    }
 
     List<Copier> copiers = new ArrayList<>();
-    for (Field toField : allNonStaticFields(targetCls)) {
+    for (Field toField : targetFields) {
       Field fromField = fromFieldsMap.get(toField.getName());
       if (fromField == null) {
         continue;
@@ -159,6 +167,9 @@ class BeanCopier implements Copier {
       }
     }
 
+    if (copiers.isEmpty()) {
+      throw new BeanAnalysisException(sourceCls.getName() + " & " + targetCls.getName() + " have no common fields to copy!");
+    }
     return copiers;
   }
 

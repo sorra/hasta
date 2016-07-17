@@ -3,12 +3,40 @@ package com.iostate.hasta.util;
 import java.util.*;
 
 import com.iostate.hasta.util.beans.*;
+import com.iostate.hasta.util.exception.BeanAnalysisException;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static java.util.Collections.singletonList;
 
 public class BeanCopyTest {
+  /**
+   * This feature is friendly to Continuous Integration (pre-test correctness in CI).
+   */
+  @Test
+  public void testPreTest() {
+    // Use such calls in unit tests to pre-test correctness.
+    BeanCopierRegistry.findOrCreate(Site.class, SiteView.class);
+    // Unfortunately this call is successful because Site and User have at least a common field `String name`
+    BeanCopierRegistry.findOrCreate(Site.class, User.class);
+
+    Exception thrown1 = null;
+    try {
+      BeanCopierRegistry.findOrCreate(Object.class, Object.class);
+    } catch (BeanAnalysisException e) {
+      thrown1 = e;
+    }
+    Assert.assertNotNull(thrown1);
+
+    Exception thrown2 = null;
+    try {
+      BeanCopierRegistry.findOrCreate(Site.class, Mono.class);
+    } catch (BeanAnalysisException e) {
+      thrown2 = e;
+    }
+    Assert.assertNotNull(thrown2);
+  }
+
   @Test
   public void testCopySingle() throws Exception {
     Site site = new Site("MySite", new HashMap<String, User>());
