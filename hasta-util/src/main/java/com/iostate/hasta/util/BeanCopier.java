@@ -37,12 +37,14 @@ class BeanCopier implements Copier {
   BeanCopier(Class<?> fromCls, Class<?> toCls) {
     this.fromCls = fromCls;
     this.toCls = toCls;
-     converter = ConverterRegistry.find(fromCls.getName(), toCls.getName());
-    try {
-      constructor = toCls.getDeclaredConstructor();
-      constructor.setAccessible(true);
-    } catch (NoSuchMethodException e) {
-      throw new BeanAnalysisException(e);
+    converter = ConverterRegistry.find(fromCls.getName(), toCls.getName());
+    if (converter == null) {
+      try {
+        constructor = toCls.getDeclaredConstructor();
+        constructor.setAccessible(true);
+      } catch (NoSuchMethodException e) {
+        throw new BeanAnalysisException(e);
+      }
     }
   }
 
@@ -55,11 +57,13 @@ class BeanCopier implements Copier {
     fromField.setAccessible(true);
     toField.setAccessible(true);
     converter = ConverterRegistry.find(fromCls.getName(), toCls.getName());
-    try {
-      constructor = toCls.getDeclaredConstructor();
-      constructor.setAccessible(true);
-    } catch (NoSuchMethodException e) {
-      throw new BeanAnalysisException(e);
+    if (converter == null) {
+      try {
+        constructor = toCls.getDeclaredConstructor();
+        constructor.setAccessible(true);
+      } catch (NoSuchMethodException e) {
+        throw new BeanAnalysisException(e);
+      }
     }
   }
 

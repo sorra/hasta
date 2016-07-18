@@ -26,7 +26,7 @@ import static java.util.Collections.singletonList;
 
 public class BeanCopyTest {
   @Test
-  public void testCopySingle() throws Exception {
+  public void testCopySingle() {
     Site site = new Site("MySite", new HashMap<String, User>());
     User admin = new User("Admin", null);
     site.setAdmin(admin);
@@ -44,7 +44,7 @@ public class BeanCopyTest {
   }
 
   @Test
-  public void testCopyCollection() throws Exception {
+  public void testCopyCollection() {
     Site site = new Site("MySite", new HashMap<String, User>());
     User admin = new User("Admin", null);
     site.setAdmin(admin);
@@ -59,7 +59,7 @@ public class BeanCopyTest {
   }
 
   @Test
-  public void testCopyMap() throws Exception {
+  public void testCopyMap() {
     Site site = new Site("MySite", new HashMap<String, User>());
     User admin = new User("Admin", null);
     site.setAdmin(admin);
@@ -76,7 +76,7 @@ public class BeanCopyTest {
   }
 
   @Test
-  public void testConverter() throws Exception {
+  public void testConverter() {
     BeanCopierRegistry.clear();
     ConverterRegistry.clear();
 
@@ -117,6 +117,21 @@ public class BeanCopyTest {
 
     BeanCopierRegistry.clear();
     ConverterRegistry.clear();
+  }
+
+  @Test
+  public void testEnumConverter() {
+    ConverterRegistry.put(Gender.class.getName(), Integer.class.getName(), new Converter() {
+      @Override
+      public Object convert(Object from) {
+        return ((Enum) from).ordinal();
+      }
+    });
+
+    List<Integer> ints = new ArrayList<>();
+    BeanCopy.copy(Arrays.asList(Gender.UNKNOWN, Gender.MALE, Gender.FEMALE), ints, Gender.class, Integer.class);
+
+    Assert.assertEquals(Arrays.asList(0, 1, 2), ints);
   }
 
   /**
