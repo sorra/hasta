@@ -135,10 +135,10 @@ public class BeanCopyTest {
   }
 
   /**
-   * This feature is friendly to Continuous Integration (pre-test correctness in CI).
+   * This feature is friendly to Continuous Integration (early test correctness in CI).
    */
   @Test
-  public void testPreTestSuccess() {
+  public void testEarlyTestSuccess() {
     // Use such calls in unit tests to pre-test correctness.
     BeanCopierRegistry.prepare(Site.class, SiteView.class);
     // Unfortunately this call is successful because Site and User have at least a common field `String name`
@@ -146,19 +146,19 @@ public class BeanCopyTest {
   }
 
   @Test(expected = BeanAnalysisException.class)
-  public void testPreTestFailure1() {
+  public void testEarlyTestFailure1() {
     // Object has no copyable field
     BeanCopierRegistry.prepare(Object.class, Object.class);
   }
 
   @Test(expected = BeanAnalysisException.class)
-  public void testPreTestFailure2() {
+  public void testEarlyTestFailure2() {
     // Site and Mono have no common fields to copy
     BeanCopierRegistry.prepare(Site.class, Mono.class);
   }
 
   @Test(expected = BeanAnalysisException.class)
-  public void testPreTestFailure3() {
+  public void testEarlyTestFailure3() {
     // For Map<K1, V> and Map<K2, V> , K1 should be the same or subclass of K2
     BeanCopierRegistry.prepare(WrongMapA.class, WrongMapB.class);
   }

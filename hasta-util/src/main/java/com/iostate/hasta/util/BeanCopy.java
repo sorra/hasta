@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * Bean copiers are cached, so that it's faster at next time.
  *
- * @see BeanCopierRegistry You can prepare bean copiers before using, in order to check correctness and warm-up cache in advance.
+ * @see BeanCopierRegistry You can prepare bean copiers before using, in order to early check correctness and warm-up cache.
  * @see ConverterRegistry Before the first call of BeanCopy, you can add custom converters to supply or override the default behavior.
  */
 @SuppressWarnings("unchecked")
