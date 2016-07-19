@@ -26,7 +26,8 @@ public class BeanCopierRegistry {
   private static Map<Pair<Class, Class>, BeanCopier> topBeanCopierMap = new ConcurrentHashMap<>();
   private static Map<Pair<Field, Field>, BeanCopier> refBeanCopierMap = new ConcurrentHashMap<>();
 
-  public static BeanCopier findOrCreate(Class sourceCls, Class targetCls) {
+  /** Prepare a bean copier before using, in order to check correctness and warm-up cache in advance */
+  public static BeanCopier prepare(Class sourceCls, Class targetCls) {
     Pair<Class, Class> pair = Pair.of(sourceCls, targetCls);
     BeanCopier beanCopier = topBeanCopierMap.get(pair);
     if (beanCopier == null) {

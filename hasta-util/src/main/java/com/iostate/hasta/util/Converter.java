@@ -17,6 +17,7 @@ package com.iostate.hasta.util;
 
 /**
  * Defines how to convert an instance of AClass to an instance of BClass.
+ * e.g. convert an enum.
  */
 public interface Converter {
   Object convert(Object from);
